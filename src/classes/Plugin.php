@@ -42,8 +42,6 @@ class Plugin
         $twig->addGlobal('site', $kirby->site());
         $twig->addGlobal('pages', $kirby->site()->pages());
         $twig->addGlobal('page', $kirby->site()->page());
-        $twig->addGlobal('user', $kirby->user());
-        $twig->addGlobal('users', $kirby->users());
 
         // treat template as a path only if it *looks like* a Twig template path
         if (Str::startsWith($path, '@') || Str::endsWith(strtolower($path), '.twig')) {

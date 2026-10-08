@@ -5,6 +5,7 @@ namespace Wearejust\Kirby\Twig;
 use Exception;
 use Kirby\Cms\App;
 use Kirby\Toolkit\F;
+use Twig\Error\Error;
 
 /**
  * Twig Template Component for Kirby
@@ -17,9 +18,9 @@ use Kirby\Toolkit\F;
  * @package  Kirby Twig Plugin
  * @author   Florens Verschelde <florens@fvsch.com>
  */
-class Template extends \Kirby\Cms\Template
+class Template extends \Kirby\Template\Template
 {
-    private static $twig;
+    private Environment $twig;
     private string $twigpath;
 
     /**
@@ -29,13 +30,10 @@ class Template extends \Kirby\Cms\Template
      * @param string $type
      * @param string $defaultType
      */
-    public function __construct(string $name, string $contentType = 'html', string $defaultType = 'html')
-    {
-        parent::__construct($name, $contentType, $defaultType);
-        $file = $this->file();
-        $viewPath = dirname(!is_null($file) ? $file : '.');
-        static::$twig = new Environment($viewPath);
-    }
+//    public function __construct(string $name, string $contentType = 'html', string $defaultType = 'html')
+//    {
+//        parent::__construct($name, $contentType, $defaultType);
+//    }
 
     /**
      * Returns the expected template file extension
@@ -110,21 +108,22 @@ class Template extends \Kirby\Cms\Template
     /**
      * @param array $data
      * @return string
+     * @throws Error
      */
     public function render(array $data = []): string
     {
+        $file = $this->file();
+        $viewPath = dirname(!is_null($file) ? $file : '.');
+        $this->twig = new Environment($viewPath);
         if ($this->isTwig()) {
-
             $kirby = kirby();
-            static::$twig->addGlobal('kirby', $kirby);
-            static::$twig->addGlobal('site', $kirby->site());
-            static::$twig->addGlobal('pages', $kirby->site()->pages());
-            static::$twig->addGlobal('page', $kirby->site()->page());
-            static::$twig->addGlobal('user', $kirby->user());
-            static::$twig->addGlobal('users', $kirby->users());
+            $this->twig->addGlobal('kirby', $kirby);
+            $this->twig->addGlobal('site', $kirby->site());
+            $this->twig->addGlobal('pages', $kirby->site()->pages());
+            $this->twig->addGlobal('page', $kirby->site()->page());
 
             // $this->name() . '.' . $this->extension()
-            return static::$twig->renderPath($this->twigpath, $data, true);
+            return $this->twig->renderPath($this->twigpath, $data, true);
         }
         return parent::render($data);
     }

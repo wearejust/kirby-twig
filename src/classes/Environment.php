@@ -230,6 +230,12 @@ class Environment
             $this->addCallable('test', $name, $func);
         }
 
+        if ($callbacks = option('wearejust.twig.ready', false)) {
+            foreach ($callbacks as $fn) {
+                $fn($this, $kirby);
+            }
+        }
+
         // Make sure the instance is stored / overwritten
         static::$instance = $this;
     }
@@ -321,7 +327,7 @@ class Environment
             // Debug mode off: show the site's error page
             try {
                 $kirby = Kirby::instance();
-                $page = $kirby->site()->page($kirby->get('option', 'error'));
+                $page = $kirby->site()->page($kirby->option('error'));   
                 if ($page) return $kirby->render($page);
             }
             // avoid loops
